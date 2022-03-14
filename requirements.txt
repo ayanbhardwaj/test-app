@@ -3,4 +3,4 @@ gunicorn
 Werkzeug~=2.0.3
 numpy~=1.22.3
 pandas~=1.4.1
-PIL
+Pillow==9.0.1
