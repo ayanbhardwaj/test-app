@@ -25,20 +25,20 @@ def color_pct_check(file_name):
         else:
             counter[str(i)] += 1
     sorted_counter = {k: v for k, v in sorted(counter.items(), key=lambda item: item[1], reverse=True)}
-    colors_list = [list(sorted_counter.keys())[:10], list(sorted_counter.values())[:10]]
+    colors_list = [list(sorted_counter.keys())[:20], list(sorted_counter.values())[:20]]
 
-    top_10_colors = []
+    top_20_colors = []
     for n in range(len(colors_list[0])):
         x = colors_list[0][n][1:-1].split(' ')
         while '' in x:
             x.remove('')
         for i in range(len(x)):
             x[i] = int(x[i])
-        top_10_colors.append([f'#{rgb_to_hex(tuple(x))}',
+        top_20_colors.append([f'#{rgb_to_hex(tuple(x))}',
                               round((colors_list[1][n]) * 100 / (sum(sorted_counter.values())), 6)])
     data = {}
-    for n in range(0, len(top_10_colors)):
-        data[top_10_colors[n][0]] = top_10_colors[n][1]
+    for n in range(0, len(top_20_colors)):
+        data[top_20_colors[n][0]] = top_20_colors[n][1]
     return data
 
 
