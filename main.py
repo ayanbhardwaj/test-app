@@ -1,10 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from werkzeug.utils import secure_filename
 import numpy as np
-import pandas as pd
-import cv2
+from PIL import Image
 import os
-from hexcodes import colors
 
 
 app = Flask(__name__)
@@ -12,27 +10,36 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
 
+def rgb_to_hex(rgb):
+    return '%02x%02x%02x' % rgb
+
+
 def color_pct_check(file_name):
     path = os.path.join('static', 'images', f'{file_name}')
-    img = cv2.imread(path)
-    diff = 20
-    keys = {}
-    for (key, value) in colors.items():
-        boundaries = [([value[2] - diff, value[1] - diff, value[0] - diff],
-                       [value[2] + diff, value[1] + diff, value[0] + diff])]
+    pil_image = Image.open(path).convert('RGB')
+    np_image = np.array(pil_image)
+    counter = {}
+    for i in np_image[0]:
+        if str(i) not in counter:
+            counter[str(i)] = 1
+        else:
+            counter[str(i)] += 1
+    sorted_counter = {k: v for k, v in sorted(counter.items(), key=lambda item: item[1], reverse=True)}
+    colors_list = [list(sorted_counter.keys())[:10], list(sorted_counter.values())[:10]]
 
-        for (lower, upper) in boundaries:
-            lower = np.array(lower, dtype=np.uint8)
-            upper = np.array(upper, dtype=np.uint8)
-            mask = cv2.inRange(img, lower, upper)
-            output = cv2.bitwise_and(img, img, mask=mask)
-
-            ratio_col = cv2.countNonZero(mask) / (img.size / 3)
-            keys[key] = np.round(ratio_col * 100, 6)
-    df = pd.DataFrame.from_dict(data=keys, orient='index')
-    new_df = df.sort_values(0, ascending=False)
-    new_df.rename(columns={0:'percentage'}, inplace=True)
-    return new_df[:10]
+    top_10_colors = []
+    for n in range(len(colors_list[0])):
+        x = colors_list[0][n][1:-1].split(' ')
+        while '' in x:
+            x.remove('')
+        for i in range(len(x)):
+            x[i] = int(x[i])
+        top_10_colors.append([f'#{rgb_to_hex(tuple(x))}',
+                              round((colors_list[1][n]) * 100 / (sum(sorted_counter.values())), 6)])
+    data = {}
+    for n in range(0, len(top_10_colors)):
+        data[top_10_colors[n][0]] = top_10_colors[n][1]
+    return data
 
 
 def allowed_image(file_name):
@@ -47,8 +54,7 @@ def allowed_image(file_name):
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    data = color_pct_check(file_name="home.jpg")
-    data_dict = data.to_dict()['percentage']
+    data_dict = color_pct_check(file_name="home.jpg")
     if request.method == 'POST':
         if request.files:
             # get file item
@@ -71,8 +77,7 @@ def home():
 
 @app.route("/result/<file>", methods=['GET', 'POST'])
 def result(file):
-    data = color_pct_check(file_name=file)
-    data_dict = data.to_dict()['percentage']
+    data_dict = color_pct_check(file_name=file)
     path = f'images/{file}'
     if request.method == 'POST':
         if request.files:
