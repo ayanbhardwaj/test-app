@@ -8,7 +8,7 @@ from hexcodes import colors
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "drivmwidxmfpxgdgddckrmkxfflosrms272df"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
 
