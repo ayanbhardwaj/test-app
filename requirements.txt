@@ -1,7 +1,5 @@
 Flask~=2.0.3
 gunicorn
 Werkzeug~=2.0.3
-numpy~=1.22.3
 pandas~=1.4.1
-Pillow==9.0.1
 opencv-contrib-python-headless

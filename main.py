@@ -1,8 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from werkzeug.utils import secure_filename
 import cv2
-import numpy as np
-from PIL import Image
 import os
 
 
