@@ -18,6 +18,7 @@ def rgb_to_hex(rgb):
 def color_pct_check(file_name):
     path = os.path.join('static', 'images', f'{file_name}')
     np_image = cv2.imread(path)
+    np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2RGB)
     counter = {}
     for i in np_image[0]:
         if str(i) not in counter:
