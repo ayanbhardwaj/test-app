@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from werkzeug.utils import secure_filename
+import cv2
 import numpy as np
 from PIL import Image
 import os
@@ -16,8 +17,7 @@ def rgb_to_hex(rgb):
 
 def color_pct_check(file_name):
     path = os.path.join('static', 'images', f'{file_name}')
-    pil_image = Image.open(path).convert('RGB')
-    np_image = np.array(pil_image)
+    np_image = cv2.imread(path)
     counter = {}
     for i in np_image[0]:
         if str(i) not in counter:
